@@ -1,5 +1,6 @@
 package apicela.notstagram.services;
 
+import apicela.notstagram.models.User;
 import apicela.notstagram.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,6 +17,12 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+        return userRepository.findByEmail(username);
+    }
+
+    public void createPendingUser(String email){
+        User u =  new User();
+        u.setEmail(email);
+        u.setRoles(new );
     }
 }

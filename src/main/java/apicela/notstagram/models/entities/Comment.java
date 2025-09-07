@@ -1,4 +1,4 @@
-package apicela.notstagram.models;
+package apicela.notstagram.models.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;

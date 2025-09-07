@@ -1,9 +1,9 @@
-package apicela.notstagram.models;
+package apicela.notstagram.models.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -18,5 +18,8 @@ public class AuthCode {
 
     private Integer code;
 
-    private Date expiration;
+    private LocalDateTime expiration;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
+
 }

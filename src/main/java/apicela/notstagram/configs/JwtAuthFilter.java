@@ -1,8 +1,7 @@
 package apicela.notstagram.configs;
 
-import apicela.notstagram.models.User;
+import apicela.notstagram.models.entities.User;
 import apicela.notstagram.services.TokenService;
-import apicela.notstagram.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,9 +23,9 @@ import java.util.List;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final TokenService jwtService;
-    private final UserService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    public JwtAuthFilter(TokenService jwtService, UserService userDetailsService) {
+    public JwtAuthFilter(TokenService jwtService, UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
     }
@@ -46,6 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         jwt = authHeader.substring(7);
         email = jwtService.extractEmail(jwt);
+        System.out.println("email-> " + email + " - jwt: " + jwt);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = (User) this.userDetailsService.loadUserByUsername(email);

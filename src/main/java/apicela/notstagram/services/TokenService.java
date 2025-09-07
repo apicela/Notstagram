@@ -1,6 +1,6 @@
 package apicela.notstagram.services;
 
-import apicela.notstagram.models.User;
+import apicela.notstagram.models.entities.User;
 import apicela.notstagram.utils.DateUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

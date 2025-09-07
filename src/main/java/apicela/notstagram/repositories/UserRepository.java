@@ -1,6 +1,6 @@
 package apicela.notstagram.repositories;
 
-import apicela.notstagram.models.User;
+import apicela.notstagram.models.entities.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +14,6 @@ public interface UserRepository extends CrudRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.inactive = false")
     User findByIdAndNotDeleted(@Param("id") UUID id);
 
-    @Query("SELECT u FROM User u WHERE u.email = :email AND u.inactive = false")
+    @Query("SELECT u FROM User u WHERE u.email = :email")
     User findByEmail(@Param("email") String email);
 }

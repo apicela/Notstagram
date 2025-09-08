@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -15,5 +16,5 @@ public interface UserRepository extends CrudRepository<User, UUID> {
     User findByIdAndNotDeleted(@Param("id") UUID id);
 
     @Query("SELECT u FROM User u WHERE u.email = :email")
-    User findByEmail(@Param("email") String email);
+    Optional<User> findByEmail(@Param("email") String email);
 }

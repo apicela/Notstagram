@@ -31,23 +31,17 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-    public RefreshToken verifyExpiration(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Refresh token não encontrado"));
-
+    public void verifyExpiration(RefreshToken refreshToken) {
         if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            refreshTokenRepository.delete(refreshToken);
             throw new RuntimeException("Refresh token expirado. Faça login novamente.");
         }
-
-        return refreshToken;
     }
 
     @Transactional
     public AuthResponse rotateToken(RefreshTokenRequest oldToken) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(oldToken.refreshToken())
                 .orElseThrow(() -> new RuntimeException("Refresh token não encontrado"));
-
+        verifyExpiration(refreshToken);
         refreshTokenRepository.delete(refreshToken);
 
         RefreshToken newToken = new RefreshToken();

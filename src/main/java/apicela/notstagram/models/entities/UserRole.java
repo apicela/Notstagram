@@ -26,10 +26,10 @@ public class UserRole implements Serializable {
     public UserRole() {
     }
 
-    public UserRole(User user, Role role, int days) {
+    public UserRole(User user, Role role, int seconds) {
         this.user = user;
         this.role = role;
-        this.expirationDate = LocalDateTime.now().plusDays(days);
+        this.expirationDate = LocalDateTime.now().plusSeconds(seconds);
     }
     @Override
     public int hashCode() {

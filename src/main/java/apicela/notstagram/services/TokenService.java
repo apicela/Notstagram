@@ -21,7 +21,7 @@ public class TokenService {
                 .setSubject(user.getEmail())
                 .claim("roles", user.getAuthorities())
                 .setIssuedAt(new Date())
-                .setExpiration(DateUtils.minutesFromNow(60))
+                .setExpiration(DateUtils.secondsFromNow(3600))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -32,7 +32,7 @@ public class TokenService {
                 .claim("roles", user.getAuthorities())
                 .claim("extra", extraAuthority)
                 .setIssuedAt(new Date())
-                .setExpiration(DateUtils.minutesFromNow(60))
+                .setExpiration(DateUtils.secondsFromNow(3600))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

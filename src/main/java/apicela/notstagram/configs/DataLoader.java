@@ -6,6 +6,7 @@ import apicela.notstagram.models.requests.CompleteRegisterRequest;
 import apicela.notstagram.models.requests.VerificationCode;
 import apicela.notstagram.repositories.RoleRepository;
 import apicela.notstagram.services.AuthCodeService;
+import apicela.notstagram.services.AuthService;
 import apicela.notstagram.services.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,13 +15,15 @@ import org.springframework.stereotype.Component;
 public class DataLoader implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
-    private final UserService userService;
+    private final AuthService authService;
     private final AuthCodeService authCodeService;
+    private final UserService userService;
 
-    public DataLoader(RoleRepository roleRepository,  UserService userService,  AuthCodeService authCodeService) {
+    public DataLoader(RoleRepository roleRepository, AuthService authService, AuthCodeService authCodeService, UserService userService) {
         this.roleRepository = roleRepository;
-        this.userService = userService;
+        this.authService = authService;
         this.authCodeService = authCodeService;
+        this.userService = userService;
     }
 
     @Override
@@ -37,11 +40,11 @@ public class DataLoader implements CommandLineRunner {
             roleRepository.save(basicRole);
         }
         String email = "jamilnetobr@gmail.com";
-        userService.createPendingUser(email);
+        authService.createPendingUser(email);
         User u = userService.getUserByEmail(email);
         int verificationCode = authCodeService.getAuthCodeFromUser(u).getCode();
-        userService.confirmPendingUser(u, verificationCode);
+        authService.confirmPendingUser(u, verificationCode);
         CompleteRegisterRequest completeRegisterRequest = new CompleteRegisterRequest("apicela","123",true);
-        userService.completeRegister(u, completeRegisterRequest);
+        authService.completeRegister(u, completeRegisterRequest);
     }
 }

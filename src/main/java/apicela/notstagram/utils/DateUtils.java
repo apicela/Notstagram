@@ -23,6 +23,10 @@ public class DateUtils {
         return LocalDateTime.now().plusDays(days);
     }
 
+    public static LocalDateTime secondsFromNowLocal(int seconds) {
+        return LocalDateTime.now().plusSeconds(seconds);
+    }
+
     public static boolean isExpired(Date expiration) {
         return expiration.before(new Date());
     }

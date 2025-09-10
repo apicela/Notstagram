@@ -16,28 +16,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SaveException.class)
     public ResponseEntity<Object> handleSaveException(SaveException ex) {
         log.error("handleSaveException {}", ex);
-        var response = new DefaultApiResponse<>(ex.getMessage(), 400);
+        var response = new DefaultApiResponse<>(ex.getMessage());
         return (ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
     }
 
     @ExceptionHandler(UpdateException.class)
     public ResponseEntity<Object> handleUpdateException(UpdateException ex) {
         log.error("handleUpdateException {}", ex);
-        var response = new DefaultApiResponse<>(ex.getMessage(), 400);
+        var response = new DefaultApiResponse<>(ex.getMessage());
         return (ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
     }
 
     @ExceptionHandler(EmailAlreadyInUseException.class)
     public ResponseEntity<Object> handleUpdateException(EmailAlreadyInUseException ex) {
         log.error("handleEmailAlreadyInUseException {}", ex);
-        var response = new DefaultApiResponse<>(ex.getMessage(), 409);
+        var response = new DefaultApiResponse<>(ex.getMessage());
         return (ResponseEntity.status(HttpStatus.CONFLICT).body(response));
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleNotFound(NotFoundException ex) {
         log.error("handleNotFound {}", ex);
-        var response = new DefaultApiResponse<>(ex.getMessage(), 404);
+        var response = new DefaultApiResponse<>(ex.getMessage());
         return (ResponseEntity.status(HttpStatus.NOT_FOUND).body(response));
     }
 
@@ -45,21 +45,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingRequestValueException.class)
     public ResponseEntity<Object> handleMissingRequestValueException(MissingRequestValueException ex) {
         log.error("handleMissingRequestValueException {}", ex);
-        var response = new DefaultApiResponse<>(ex.getMessage(), 400);
+        var response = new DefaultApiResponse<>(ex.getMessage());
         return (ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Object> handleBadCredentials(BadCredentialsException ex) {
         log.error("handleException {}", ex);
-        var response = new DefaultApiResponse<>(ex.getMessage(), 401);
+        var response = new DefaultApiResponse<>(ex.getMessage());
         return (ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> exception(Exception ex) {
+        var response = new DefaultApiResponse<>(ex.getMessage());
         log.error("handleException {}", ex);
-        var response = new DefaultApiResponse<>(ex.getMessage(), 500);
         return (ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
     }
 }

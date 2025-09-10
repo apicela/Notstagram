@@ -23,7 +23,7 @@ public class AuthCodeService {
 
     public void generateAuthCodeAndSendEmail(User u) {
         AuthCode authCode = getAuthCodeFromUser(u);
-        sendMail(u, authCode);
+  //      sendMail(u, authCode);
     }
 
     public AuthCode getAuthCodeFromUser(User user) {

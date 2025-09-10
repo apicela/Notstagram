@@ -35,7 +35,7 @@ public class AuthService {
         User user = new User();
         user.setEmail(email);
         userRepository.save(user);
-        //  authCodeService.generateAuthCodeAndSendEmail(user);
+        authCodeService.generateAuthCodeAndSendEmail(user);
         String token = tokenService.generateTokenWithExtraAuthority(user, "PENDING_USER_TOKEN");
         return new AuthResponse(token, null, tokenSettings.getAccessToken().getExpirationSeconds());
     }

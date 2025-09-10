@@ -51,6 +51,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = (User) this.userDetailsService.loadUserByUsername(email);
 
+//            if (userDetails.isInactive() && !request.getRequestURI().equals("/users/me/activate")) {
+//                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+//                response.getWriter().write("Usuário inativo. Ative a conta para acessar.");
+//                return;
+//            }
+
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
 

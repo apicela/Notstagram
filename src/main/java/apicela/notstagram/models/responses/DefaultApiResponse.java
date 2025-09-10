@@ -1,21 +1,21 @@
 package apicela.notstagram.models.responses;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DefaultApiResponse<T> {
     private String message;
     private T data;
-    private int status;
 
-    public DefaultApiResponse(String message, T data, int statusCode) {
+    public DefaultApiResponse(String message, T data) {
         this.message = message;
         this.data = data;
-        this.status = statusCode;
     }
 
-    public DefaultApiResponse(String message, int statusCode) {
-        this(message, null, statusCode);
+    public DefaultApiResponse(String message) {
+        this(message, null);
     }
 
     @Override
@@ -23,7 +23,6 @@ public class DefaultApiResponse<T> {
         return "DefaultApiResponse{" +
                 "message='" + message + '\'' +
                 ", data=" + data +
-                ", status=" + status +
                 '}';
     }
 }

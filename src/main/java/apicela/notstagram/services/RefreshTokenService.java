@@ -1,6 +1,7 @@
 package apicela.notstagram.services;
 
 import apicela.notstagram.configs.TokenSettings;
+import apicela.notstagram.exceptions.NotFoundException;
 import apicela.notstagram.models.entities.RefreshToken;
 import apicela.notstagram.models.entities.User;
 import apicela.notstagram.models.requests.RefreshTokenRequest;
@@ -8,6 +9,7 @@ import apicela.notstagram.models.responses.AuthResponse;
 import apicela.notstagram.repositories.RefreshTokenRepository;
 import apicela.notstagram.utils.DateUtils;
 import jakarta.transaction.Transactional;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,11 +21,12 @@ public class RefreshTokenService {
     TokenService tokenService;
     TokenSettings tokenSettings;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository,  TokenService tokenService,  TokenSettings tokenSettings) {
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, TokenService tokenService, TokenSettings tokenSettings) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.tokenService = tokenService;
         this.tokenSettings = tokenSettings;
     }
+
     public RefreshToken createRefreshToken(User user) {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
@@ -33,14 +36,14 @@ public class RefreshTokenService {
 
     public void verifyExpiration(RefreshToken refreshToken) {
         if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Refresh token expirado. Faça login novamente.");
+            throw new CredentialsExpiredException("Invalid refresh token. Try login again.");
         }
     }
 
     @Transactional
     public AuthResponse rotateToken(RefreshTokenRequest oldToken) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(oldToken.refreshToken())
-                .orElseThrow(() -> new RuntimeException("Refresh token não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Refresh token not found."));
         verifyExpiration(refreshToken);
         refreshTokenRepository.delete(refreshToken);
 

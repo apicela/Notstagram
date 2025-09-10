@@ -31,6 +31,7 @@ public class UserRole implements Serializable {
         this.role = role;
         this.expirationDate = LocalDateTime.now().plusSeconds(seconds);
     }
+
     @Override
     public int hashCode() {
         return java.util.Objects.hash(user, role);

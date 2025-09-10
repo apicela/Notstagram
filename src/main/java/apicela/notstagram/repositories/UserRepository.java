@@ -13,8 +13,17 @@ import java.util.UUID;
 public interface UserRepository extends CrudRepository<User, UUID> {
 
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.inactive = false")
-    User findByIdAndNotDeleted(@Param("id") UUID id);
+    Optional<User> findByIdAndNotDeleted(@Param("id") UUID id);
 
     @Query("SELECT u FROM User u WHERE u.email = :email")
     Optional<User> findByEmail(@Param("email") String email);
+
+    @Query("SELECT u FROM User u WHERE u.username = :username")
+    Optional<User> findByUsername(@Param("username") String username);
+
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email = :email")
+    boolean existsByEmail(@Param("email") String email);
+
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.username = :username")
+    boolean existsByUsername(@Param("username") String username);
 }

@@ -1,6 +1,5 @@
 package apicela.notstagram.services;
 
-import apicela.notstagram.exceptions.NotFoundException;
 import apicela.notstagram.models.entities.Role;
 import apicela.notstagram.repositories.RoleRepository;
 import jakarta.persistence.EntityNotFoundException;

@@ -21,6 +21,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final TokenSettings tokenSettings;
+
     public AuthService(UserRepository userRepository, RoleService roleService, TokenService tokenService, AuthCodeService authCodeService, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder, TokenSettings tokenSettings) {
         this.userRepository = userRepository;
         this.roleService = roleService;
@@ -44,7 +45,7 @@ public class AuthService {
     @Transactional
     public AuthResponse confirmPendingUser(User user, int verificationCode) {
         AuthCode auth = authCodeService.getAuthCodeFromUser(user);
-        if(verificationCode != auth.getCode()) {
+        if (verificationCode != auth.getCode()) {
             throw new BadCredentialsException("Invalid verification code");
         }
         user.setVerified(true);
@@ -68,7 +69,7 @@ public class AuthService {
         return login(new LoginRequest(user.getEmail(), completeRegisterRequest.password()));
     }
 
-    public AuthResponse login(LoginRequest loginRequest){
+    public AuthResponse login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 

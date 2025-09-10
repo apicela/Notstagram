@@ -21,11 +21,12 @@ public class RefreshTokenService {
     TokenService tokenService;
     TokenSettings tokenSettings;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository,  TokenService tokenService,  TokenSettings tokenSettings) {
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, TokenService tokenService, TokenSettings tokenSettings) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.tokenService = tokenService;
         this.tokenSettings = tokenSettings;
     }
+
     public RefreshToken createRefreshToken(User user) {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);

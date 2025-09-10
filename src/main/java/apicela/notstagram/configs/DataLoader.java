@@ -3,7 +3,6 @@ package apicela.notstagram.configs;
 import apicela.notstagram.models.entities.Role;
 import apicela.notstagram.models.entities.User;
 import apicela.notstagram.models.requests.CompleteRegisterRequest;
-import apicela.notstagram.models.requests.VerificationCode;
 import apicela.notstagram.repositories.RoleRepository;
 import apicela.notstagram.services.AuthCodeService;
 import apicela.notstagram.services.AuthService;
@@ -44,7 +43,7 @@ public class DataLoader implements CommandLineRunner {
         User u = userService.getUserByEmail(email);
         int verificationCode = authCodeService.getAuthCodeFromUser(u).getCode();
         authService.confirmPendingUser(u, verificationCode);
-        CompleteRegisterRequest completeRegisterRequest = new CompleteRegisterRequest("apicela","123",true);
+        CompleteRegisterRequest completeRegisterRequest = new CompleteRegisterRequest("apicela", "123", true);
         authService.completeRegister(u, completeRegisterRequest);
     }
 }

@@ -2,6 +2,7 @@ package apicela.notstagram.services;
 
 import apicela.notstagram.models.entities.User;
 import apicela.notstagram.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,9 +20,9 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void followUser(User source, String targetUsername) {
         source = userRepository.findById(source.getId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário source não encontrado: " ));
         User target = userRepository.findByUsername(targetUsername)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário target não encontrado: " + targetUsername));
         target.getFollowers().add(source);
         source.getFollowing().add(target);
         userRepository.save(target);
@@ -30,9 +31,9 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void unfollowUser(User source, String targetUsername) {
         source = userRepository.findById(source.getId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
         User target = userRepository.findByUsername(targetUsername)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
         target.getFollowers().remove(source);
         source.getFollowing().remove(target);
         userRepository.save(target);
@@ -54,6 +55,6 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
 }

@@ -11,6 +11,7 @@ public class TokenSettings {
     private TokenConfig accessToken;
     private TokenConfig refreshToken;
     private TokenConfig rolePermission;
+
     @Data
     public static class TokenConfig {
         private int expirationSeconds;

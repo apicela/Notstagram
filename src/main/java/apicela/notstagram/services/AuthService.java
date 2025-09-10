@@ -1,6 +1,8 @@
 package apicela.notstagram.services;
 
 import apicela.notstagram.configs.TokenSettings;
+import apicela.notstagram.exceptions.EmailAlreadyInUseException;
+import apicela.notstagram.exceptions.UsernameAlreadyInUseException;
 import apicela.notstagram.models.entities.*;
 import apicela.notstagram.models.requests.CompleteRegisterRequest;
 import apicela.notstagram.models.requests.LoginRequest;
@@ -8,6 +10,7 @@ import apicela.notstagram.models.responses.AuthResponse;
 import apicela.notstagram.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final TokenSettings tokenSettings;
+
     public AuthService(UserRepository userRepository, RoleService roleService, TokenService tokenService, AuthCodeService authCodeService, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder, TokenSettings tokenSettings) {
         this.userRepository = userRepository;
         this.roleService = roleService;
@@ -32,6 +36,9 @@ public class AuthService {
 
     @Transactional
     public AuthResponse createPendingUser(String email) {
+        if (userRepository.existsByEmail(email))
+            throw new EmailAlreadyInUseException("E-mail already in use");
+
         User user = new User();
         user.setEmail(email);
         userRepository.save(user);
@@ -43,8 +50,8 @@ public class AuthService {
     @Transactional
     public AuthResponse confirmPendingUser(User user, int verificationCode) {
         AuthCode auth = authCodeService.getAuthCodeFromUser(user);
-        if(verificationCode != auth.getCode()) {
-            throw new RuntimeException();
+        if (verificationCode != auth.getCode()) {
+            throw new BadCredentialsException("Invalid verification code");
         }
         user.setVerified(true);
         userRepository.save(user);
@@ -55,6 +62,9 @@ public class AuthService {
 
     @Transactional
     public AuthResponse completeRegister(User user, @Valid CompleteRegisterRequest completeRegisterRequest) {
+        if (userRepository.existsByUsername(completeRegisterRequest.username()))
+            throw new UsernameAlreadyInUseException("Username already in use");
+
         String hashedPassword = passwordEncoder.encode(completeRegisterRequest.password());
         user.setUsername(completeRegisterRequest.username());
         user.setPassword(hashedPassword);
@@ -67,12 +77,12 @@ public class AuthService {
         return login(new LoginRequest(user.getEmail(), completeRegisterRequest.password()));
     }
 
-    public AuthResponse login(LoginRequest loginRequest){
+    public AuthResponse login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
         if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
-            throw new RuntimeException("Senha inválida");
+            throw new BadCredentialsException("Invalid username or password");
         }
 
         String accessToken = tokenService.generateToken(user);

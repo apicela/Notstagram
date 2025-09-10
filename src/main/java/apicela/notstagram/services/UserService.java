@@ -18,6 +18,8 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void followUser(User source, String targetUsername) {
+        source = userRepository.findById(source.getId())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         User target = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         target.getFollowers().add(source);
@@ -27,6 +29,8 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void unfollowUser(User source, String targetUsername) {
+        source = userRepository.findById(source.getId())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         User target = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         target.getFollowers().remove(source);

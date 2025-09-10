@@ -1,6 +1,8 @@
 package apicela.notstagram.services;
 
 import apicela.notstagram.configs.TokenSettings;
+import apicela.notstagram.exceptions.EmailAlreadyInUseException;
+import apicela.notstagram.exceptions.UsernameAlreadyInUseException;
 import apicela.notstagram.models.entities.*;
 import apicela.notstagram.models.requests.CompleteRegisterRequest;
 import apicela.notstagram.models.requests.LoginRequest;
@@ -34,6 +36,9 @@ public class AuthService {
 
     @Transactional
     public AuthResponse createPendingUser(String email) {
+        if (userRepository.existsByEmail(email))
+            throw new EmailAlreadyInUseException("E-mail already in use");
+
         User user = new User();
         user.setEmail(email);
         userRepository.save(user);
@@ -57,6 +62,9 @@ public class AuthService {
 
     @Transactional
     public AuthResponse completeRegister(User user, @Valid CompleteRegisterRequest completeRegisterRequest) {
+        if (userRepository.existsByUsername(completeRegisterRequest.username()))
+            throw new UsernameAlreadyInUseException("Username already in use");
+
         String hashedPassword = passwordEncoder.encode(completeRegisterRequest.password());
         user.setUsername(completeRegisterRequest.username());
         user.setPassword(hashedPassword);

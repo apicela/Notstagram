@@ -8,6 +8,7 @@ import apicela.notstagram.models.responses.AuthResponse;
 import apicela.notstagram.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,7 @@ public class AuthService {
     public AuthResponse confirmPendingUser(User user, int verificationCode) {
         AuthCode auth = authCodeService.getAuthCodeFromUser(user);
         if(verificationCode != auth.getCode()) {
-            throw new RuntimeException();
+            throw new BadCredentialsException("Invalid verification code");
         }
         user.setVerified(true);
         userRepository.save(user);
@@ -69,10 +70,10 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest loginRequest){
         User user = userRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
         if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
-            throw new RuntimeException("Senha inválida");
+            throw new BadCredentialsException("Invalid username or password");
         }
 
         String accessToken = tokenService.generateToken(user);

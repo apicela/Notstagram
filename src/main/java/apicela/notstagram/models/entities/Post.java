@@ -17,15 +17,14 @@ public class Post {
     @ManyToOne
     private User user;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    private byte[] mediaData;
+    private String description;
+
+    private String mediaPath;
 
     @Enumerated(EnumType.STRING)
-    private PostType type = PostType.IMAGE;
+    private PostType type;
 
-
-    private String description;
+    private String contentType;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 

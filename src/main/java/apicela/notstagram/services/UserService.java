@@ -9,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
@@ -20,7 +23,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void followUser(User source, String targetUsername) {
         source = userRepository.findById(source.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Usuário source não encontrado: " ));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário source não encontrado: "));
         User target = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário target não encontrado: " + targetUsername));
         target.getFollowers().add(source);
@@ -56,5 +59,9 @@ public class UserService implements UserDetailsService {
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+    }
+
+    public List<UUID> findFollowingList(UUID userId) {
+        return userRepository.findFollowingIds(userId);
     }
 }

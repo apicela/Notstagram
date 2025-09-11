@@ -54,8 +54,12 @@ public class TokenService {
     }
 
     public boolean isTokenValid(String token, User user) {
-        return extractEmail(token).equals(user.getEmail())
-                && !isTokenExpired(token);
+        try {
+            return extractEmail(token).equals(user.getEmail())
+                    && !isTokenExpired(token);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {

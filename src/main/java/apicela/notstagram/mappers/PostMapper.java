@@ -4,8 +4,9 @@ import apicela.notstagram.models.dtos.PostDTO;
 import apicela.notstagram.models.dtos.UserSummaryDTO;
 import apicela.notstagram.models.entities.Post;
 import apicela.notstagram.models.entities.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class PostMapper {
@@ -32,5 +33,11 @@ public class PostMapper {
                 commentMapper.toDTOList(post.getComments())
 
         );
+    }
+
+    public List<PostDTO> toDTOList(List<Post> posts, User loggedUser) {
+        return posts.stream()
+                .map(post -> toDTO(post, loggedUser))
+                .toList();
     }
 }

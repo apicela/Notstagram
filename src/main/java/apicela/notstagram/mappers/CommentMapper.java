@@ -16,7 +16,7 @@ public class CommentMapper {
                 comment.getText(),
                 comment.getCreatedAt(),
                 new UserSummaryDTO(comment.getUser().getUsername())
-                );
+        );
     }
 
     public List<CommentDTO> toDTOList(List<Comment> comments) {

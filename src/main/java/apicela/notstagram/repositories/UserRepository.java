@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,4 +27,7 @@ public interface UserRepository extends CrudRepository<User, UUID> {
 
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.username = :username")
     boolean existsByUsername(@Param("username") String username);
+
+    @Query("SELECT u.id FROM User u JOIN u.followers f WHERE f.id = :userId")
+    List<UUID> findFollowingIds(@Param("userId") UUID userId);
 }

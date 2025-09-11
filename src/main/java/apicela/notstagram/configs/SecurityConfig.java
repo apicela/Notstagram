@@ -40,7 +40,8 @@ public class SecurityConfig {
                                 "/user/register/email",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/h2-console/**"
+                                "/h2-console/**",
+                                "/post/*/media"
 
                         )
                         .permitAll()

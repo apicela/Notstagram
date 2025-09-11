@@ -1,8 +1,8 @@
 package apicela.notstagram.controllers;
 
-import apicela.notstagram.models.entities.Post;
+import apicela.notstagram.models.dtos.PostDTO;
 import apicela.notstagram.models.entities.User;
-import apicela.notstagram.models.requests.PostDTORequest;
+import apicela.notstagram.models.dtos.GetMediaDTO;
 import apicela.notstagram.services.PostService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/post")
 @Log4j2
 public class PostController {
     private final PostService postService;
@@ -25,18 +25,24 @@ public class PostController {
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Post> uploadPost(@AuthenticationPrincipal User user,
-            @RequestParam("dto") PostDTORequest dto
+    public ResponseEntity<Void> uploadPost(@AuthenticationPrincipal User user,
+                                           @RequestPart("description") String description,
+                                           @RequestPart("file") MultipartFile file
     ) throws IOException {
-        Post savedPost = postService.createPost(user, dto);
-        return ResponseEntity.ok(savedPost);
+        postService.createPost(user, file, description);
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/media")
+    @GetMapping("/{id}")
+    public ResponseEntity<PostDTO> getPost(@AuthenticationPrincipal User user, @PathVariable UUID id) throws IOException {
+        return ResponseEntity.ok().body(postService.getPost(id, user));
+    }
+
+    @GetMapping("/media/{id}")
     public ResponseEntity<byte[]> getMedia(@PathVariable UUID id) throws IOException {
-        byte[] file = postService.loadFile(id);
+        GetMediaDTO dto = postService.loadFile(id);
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(file);
+                .contentType(org.springframework.http.MediaType.parseMediaType(dto.contentType()))
+                .body(dto.bytes());
     }
 }

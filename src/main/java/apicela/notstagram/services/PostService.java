@@ -53,22 +53,30 @@ public class PostService {
         Files.createDirectories(filePath.getParent());
 
         // Salva fisicamente no sistema de arquivos
-        Files.write(filePath, file.getBytes());
 
-        // Salva no banco apenas o caminho relativo
-        Post post = new Post();
-        post.setUser(user);
-        post.setMediaPath(filePath.toString());
-        post.setType(postType);
-        post.setContentType(contentType);
-        post.setDescription(description);
+        Files.write(filePath, file.getBytes());
+        Post post = postMapper.toEntity(user, description, filePath.toString(), postType, contentType);
         postRepository.save(post);
     }
 
     public PostDTO getPost(UUID postId, User user) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
         return postMapper.toDTO(post, user);
+    }
+
+    public void likePost(User user, UUID postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+        post.getLikedBy().add(user);
+        postRepository.save(post);
+    }
+
+    public void unlikePost(User user, UUID postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+        post.getLikedBy().remove(user);
+        postRepository.save(post);
     }
 
     public List<PostDTO> getFeed(User user) {

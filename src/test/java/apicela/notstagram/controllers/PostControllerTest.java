@@ -1,8 +1,8 @@
 package apicela.notstagram.controllers;
 
-import apicela.notstagram.models.entities.User;
-import apicela.notstagram.models.dtos.PostDTO;
 import apicela.notstagram.models.dtos.GetMediaDTO;
+import apicela.notstagram.models.dtos.PostDTO;
+import apicela.notstagram.models.entities.User;
 import apicela.notstagram.services.PostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,13 +11,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class PostControllerTest {

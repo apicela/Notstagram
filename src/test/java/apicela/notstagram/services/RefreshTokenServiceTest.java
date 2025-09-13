@@ -1,11 +1,11 @@
 package apicela.notstagram.services;
 
 import apicela.notstagram.configs.TokenSettings;
-import apicela.notstagram.models.responses.AuthResponse;
-import apicela.notstagram.models.requests.RefreshTokenRequest;
 import apicela.notstagram.exceptions.NotFoundException;
 import apicela.notstagram.models.entities.RefreshToken;
 import apicela.notstagram.models.entities.User;
+import apicela.notstagram.models.requests.RefreshTokenRequest;
+import apicela.notstagram.models.responses.AuthResponse;
 import apicela.notstagram.repositories.RefreshTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

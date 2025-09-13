@@ -1,7 +1,6 @@
 package apicela.notstagram.services;
 
 
-
 import apicela.notstagram.mappers.PostMapper;
 import apicela.notstagram.models.PostType;
 import apicela.notstagram.models.dtos.GetMediaDTO;
@@ -23,7 +22,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

@@ -8,22 +8,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class UserControllerTest {
 
+    private static final String USERNAME_TO_FOLLOW = "testuser";
     @Mock
     private UserService userService;
-
     @InjectMocks
     private UserController userController;
-
     private User mockUser;
-
-    private static final String USERNAME_TO_FOLLOW = "testuser";
 
     @BeforeEach
     void setUp() {

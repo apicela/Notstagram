@@ -7,6 +7,7 @@ import apicela.notstagram.models.dtos.PostDTO;
 import apicela.notstagram.models.entities.Post;
 import apicela.notstagram.models.entities.User;
 import apicela.notstagram.repositories.PostRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,7 +79,7 @@ public class PostService {
 
     public GetMediaDTO loadFile(UUID postId) throws IOException {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
         Path path = Paths.get(post.getMediaPath());
         return new GetMediaDTO(Files.readAllBytes(path), post.getContentType());

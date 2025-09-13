@@ -1,7 +1,12 @@
 package apicela.notstagram.controllers;
 
 import apicela.notstagram.models.entities.User;
+import apicela.notstagram.models.responses.DefaultApiResponse;
 import apicela.notstagram.services.UserService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,12 +24,22 @@ public class UserController {
     }
 
     @PostMapping("/{username}/follow")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Usuário seguido com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
+                    content = @Content(schema = @Schema(implementation = DefaultApiResponse.class)))
+    })
     public ResponseEntity<Void> followUser(@AuthenticationPrincipal User user, @PathVariable String username) {
         userService.followUser(user, username);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{username}/follow")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Usuário deixado de seguir com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
+                    content = @Content(schema = @Schema(implementation = DefaultApiResponse.class)))
+    })
     public ResponseEntity<Void> unfollowUser(@AuthenticationPrincipal User user, @PathVariable String username) {
         userService.unfollowUser(user, username);
         return ResponseEntity.noContent().build();
@@ -32,6 +47,9 @@ public class UserController {
 
     @PreAuthorize("!#user.inactive")
     @DeleteMapping("/me/deactivate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Usuário desativado com sucesso")
+    })
     public ResponseEntity<Void> deactivate(@AuthenticationPrincipal User user) {
         userService.deactivateUser(user);
         return ResponseEntity.noContent().build();
@@ -39,6 +57,9 @@ public class UserController {
 
     @PreAuthorize("#user.inactive")
     @PostMapping("/me/activate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Usuário ativado com sucesso")
+    })
     public ResponseEntity<Void> activate(@AuthenticationPrincipal User user) {
         userService.activateUser(user);
         return ResponseEntity.noContent().build();

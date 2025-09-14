@@ -18,7 +18,7 @@ public class CommentMapper {
                 comment.getId(),
                 comment.getText(),
                 comment.getCreatedAt(),
-                new UserSummaryDTO(comment.getUser().getUsername())
+                new UserSummaryDTO(comment.getUser().getUsername(), comment.getUser().getProfilePhoto())
         );
     }
 

@@ -45,5 +45,13 @@ public class DataLoader implements CommandLineRunner {
         authService.confirmPendingUser(u, verificationCode);
         CompleteRegisterRequest completeRegisterRequest = new CompleteRegisterRequest("apicela", "123", true);
         authService.completeRegister(u, completeRegisterRequest);
+
+        String email2 = "jamilnetobr2@gmail.com";
+        authService.createPendingUser(email2);
+        User u2 = userService.getUserByEmail(email2);
+        int verificationCode2 = authCodeService.getAuthCodeFromUser(u2).getCode();
+        authService.confirmPendingUser(u2, verificationCode2);
+        CompleteRegisterRequest completeRegisterRequest2 = new CompleteRegisterRequest("apicela2", "123", true);
+        authService.completeRegister(u2, completeRegisterRequest2);
     }
 }

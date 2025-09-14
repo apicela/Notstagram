@@ -18,10 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController()
 @RequestMapping("/auth")
@@ -68,7 +65,7 @@ public class AuthController {
 
 
     @PreAuthorize("hasAuthority('PENDING_USER_TOKEN')")
-    @PostMapping("/register/confirm")
+    @PatchMapping("/register/confirm")
     @Operation(
             summary = "Confirmar o email do usuário.",
             description = "Segundo passo do processo de registro. Exige um **token temporário** (`PENDING_USER_TOKEN`) e um código de verificação recebido por email. Se válido, retorna um novo **token temporário** com autoridade `CONFIRMED_USER_TOKEN`."
@@ -87,7 +84,7 @@ public class AuthController {
 
 
     @PreAuthorize("hasAuthority('CONFIRMED_USER_TOKEN')")
-    @PostMapping("/register/complete")
+    @PatchMapping("/register/complete")
     @Operation(
             summary = "Concluir o registro do usuário.",
             description = "Etapa final do registro. Exige um **token temporário** (`CONFIRMED_USER_TOKEN`). O usuário envia nome de usuário, senha e preferência de perfil público (`CompleteRegisterRequest`). Retorna os tokens definitivos."
@@ -121,15 +118,42 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
+    @Operation(
+            summary = "Solicitar redefinição de senha",
+            description = "Envia um e-mail com instruções para redefinir a senha do usuário."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "E-mail de redefinição de senha enviado com sucesso",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "E-mail inválido ou usuário não encontrado",
+                    content = @Content(schema = @Schema(implementation = DefaultApiResponse.class)))
+    })
     public ResponseEntity<AuthResponse> resetPassword(@RequestBody @Valid EmailDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.resetPassword(dto.email()));
     }
 
     @PreAuthorize("hasAuthority('RESET_PASSWORD')")
-    @PostMapping("/change-password")
-    public ResponseEntity<AuthResponse> changePassword(@AuthenticationPrincipal User user, @RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
+    @PutMapping("/change-password")
+    @Operation(
+            summary = "Alterar senha do usuário",
+            description = "Permite que o usuário altere sua senha após solicitar a redefinição. "
+                    + "Necessário possuir a permissão `RESET_PASSWORD`."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Senha alterada com sucesso",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou senha não atende os requisitos mínimos",
+                    content = @Content(schema = @Schema(implementation = DefaultApiResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado ou token inválido",
+                    content = @Content(schema = @Schema(implementation = DefaultApiResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário não possui a permissão necessária para alterar senha",
+                    content = @Content(schema = @Schema(implementation = DefaultApiResponse.class)))
+    })
+    public ResponseEntity<AuthResponse> changePassword(@AuthenticationPrincipal User user,
+                                                       @RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.changePassword(user, changePasswordRequest));
     }
+
 
     record EmailDTO(@Schema(example = "jamilnetobr@gmail.com", description = "O e-mail do usuário")
                     @Email(message = "E-mail invalid") String email) {

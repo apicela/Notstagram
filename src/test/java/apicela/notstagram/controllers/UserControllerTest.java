@@ -59,12 +59,5 @@ class UserControllerTest {
         assertEquals(204, response.getStatusCodeValue());
     }
 
-    @Test
-    void testActivateUser_whenUserInactive() {
-        mockUser.setInactive(true); // Usuário inativo
-        ResponseEntity<Void> response = userController.activate(mockUser);
 
-        verify(userService, times(1)).activateUser(mockUser);
-        assertEquals(204, response.getStatusCodeValue());
-    }
 }

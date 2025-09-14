@@ -29,15 +29,19 @@ public class User implements UserDetails {
 
     private String password;
 
+    private String description;
+
+    private String profilePhoto;
+
     @Column(unique = true)
     @EqualsAndHashCode.Include
     private String email;
 
     private boolean inactive = true;
 
-    private boolean verified;
+    private boolean verified = false;
 
-    private boolean publicProfile;
+    private boolean publicProfile = true;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 

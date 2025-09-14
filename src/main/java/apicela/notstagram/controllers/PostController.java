@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/posts")
 @Log4j2
 public class PostController {
     private final PostService postService;
@@ -65,6 +65,19 @@ public class PostController {
         return ResponseEntity.ok().body(postService.getPost(id, user));
     }
 
+    @PostMapping("/{postId}/likes")
+    public ResponseEntity<Void> likePost(@AuthenticationPrincipal User user,
+                                         @PathVariable("postId") UUID postId) {
+        postService.likePost(user, postId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{postId}/likes")
+    public ResponseEntity<Void> unlikePost(@AuthenticationPrincipal User user,
+                                           @PathVariable("postId") UUID postId) {
+        postService.unlikePost(user, postId);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/feed")
     @Operation(
@@ -94,8 +107,8 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "Mídia não encontrada",
                     content = @Content(schema = @Schema(implementation = DefaultApiResponse.class)))
     })
-    public ResponseEntity<byte[]> getMedia(@PathVariable UUID id) throws IOException {
-        GetMediaDTO dto = postService.loadFile(id);
+    public ResponseEntity<byte[]> getMedia(@AuthenticationPrincipal User user, @PathVariable UUID id) throws IOException {
+        GetMediaDTO dto = postService.loadFile(user, id);
         return ResponseEntity.ok()
                 .contentType(org.springframework.http.MediaType.parseMediaType(dto.contentType()))
                 .body(dto.bytes());

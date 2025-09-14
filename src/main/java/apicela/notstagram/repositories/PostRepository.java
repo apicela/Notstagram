@@ -1,6 +1,7 @@
 package apicela.notstagram.repositories;
 
 import apicela.notstagram.models.entities.Post;
+import apicela.notstagram.models.entities.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -13,4 +14,6 @@ import java.util.UUID;
 public interface PostRepository extends CrudRepository<Post, UUID> {
     @Query("SELECT p FROM Post p WHERE p.user.id IN :following ORDER BY p.createdAt DESC")
     List<Post> findPostsFromFollowing(@Param("following") List<UUID> following);
+
+    List<Post> findByUser(User user);
 }

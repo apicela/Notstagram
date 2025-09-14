@@ -15,6 +15,5 @@ public record PostDTO(UUID id,
                       UserSummaryDTO user,
                       int likesCount,
                       boolean likedByMe,
-                      int commentsCount,
-                      List<CommentDTO> recentComments) {
+                      int commentsCount) {
 }

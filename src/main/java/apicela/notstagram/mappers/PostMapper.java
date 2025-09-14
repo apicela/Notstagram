@@ -1,5 +1,6 @@
 package apicela.notstagram.mappers;
 
+import apicela.notstagram.models.PostType;
 import apicela.notstagram.models.dtos.PostDTO;
 import apicela.notstagram.models.dtos.UserSummaryDTO;
 import apicela.notstagram.models.entities.Post;
@@ -26,13 +27,21 @@ public class PostMapper {
                 post.getType(),
                 post.getContentType(),
                 post.getCreatedAt(),
-                new UserSummaryDTO(post.getUser().getUsername()),
+                new UserSummaryDTO(post.getUser().getUsername(), post.getUser().getProfilePhoto()),
                 post.getLikedBy().size(),
                 likedByMe,
-                post.getComments().size(),
-                commentMapper.toDTOList(post.getComments())
-
+                post.getComments().size()
         );
+    }
+
+    public Post toEntity(User user, String description, String mediaPath, PostType postType, String contentType) {
+        Post post = new Post();
+        post.setUser(user);
+        post.setDescription(description);
+        post.setMediaPath(mediaPath);
+        post.setType(postType);
+        post.setContentType(contentType);
+        return post;
     }
 
     public List<PostDTO> toDTOList(List<Post> posts, User loggedUser) {

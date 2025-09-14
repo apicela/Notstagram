@@ -1,7 +1,9 @@
 package apicela.notstagram.services;
 
+import apicela.notstagram.exceptions.UsernameAlreadyInUseException;
 import apicela.notstagram.mappers.UserMapper;
 import apicela.notstagram.models.dtos.FileDTO;
+import apicela.notstagram.models.dtos.PostDTO;
 import apicela.notstagram.models.entities.User;
 import apicela.notstagram.models.requests.EditProfileRequest;
 import apicela.notstagram.models.responses.UserProfileResponse;
@@ -25,15 +27,21 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final FileStorageService fileStorageService;
+    private final PostService postService;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, FileStorageService fileStorageService) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, FileStorageService fileStorageService, PostService postService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.fileStorageService = fileStorageService;
+        this.postService = postService;
     }
 
-    public UserProfileResponse getProfile(String username) throws UsernameNotFoundException {
-        return  null;
+    public UserProfileResponse getProfile(User requester, String username) throws UsernameNotFoundException, BadRequestException {
+        User target = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        validateUserVisibility(requester, target);
+        List<PostDTO> targetPosts = postService.getPosts(requester, target);
+        requester = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        return userMapper.toUserProfileResponse(requester, targetPosts);
     }
 
     @Transactional
@@ -60,16 +68,24 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void editProfile(User user, EditProfileRequest editProfileRequest, MultipartFile file) throws IOException {
+        if (existsByUsername(editProfileRequest.username()))
+            throw new UsernameAlreadyInUseException("Username already in use");
+
         user = userRepository.findById(user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        String contentType = file.getContentType();
 
-        if (contentType != null && contentType.startsWith("image/"))
-            throw new BadRequestException("Invalid content type");
+        if (file != null) {
+            String contentType = file.getContentType();
 
-        FileDTO fileDTO = fileStorageService.saveFile(file);
+            if (contentType != null && contentType.startsWith("image/"))
+                throw new BadRequestException("Invalid content type");
 
-        userRepository.save(userMapper.editProfile(user, editProfileRequest, fileDTO.path()));
+            FileDTO fileDTO = fileStorageService.saveFile(file);
+
+            userRepository.save(userMapper.editProfile(user, editProfileRequest, fileDTO.path()));
+        } else
+            userRepository.save(userMapper.editProfile(user, editProfileRequest, null));
+
     }
 
     public void deactivateUser(User user) {
@@ -109,5 +125,18 @@ public class UserService implements UserDetailsService {
 
     public void save(User user) {
         userRepository.save(user);
+    }
+
+    private void validateUserVisibility(User requester, User target) throws BadRequestException {
+        boolean isOwner = requester.getId().equals(target.getId());
+        if (isOwner) return;
+
+        boolean ownerInactive = target.isInactive();
+        boolean ownerPrivate = !target.isPublicProfile();
+        boolean requesterIsFollower = target.getFollowers().contains(requester);
+
+        if (ownerInactive || (ownerPrivate && !requesterIsFollower)) {
+            throw new BadRequestException("User is not visible");
+        }
     }
 }

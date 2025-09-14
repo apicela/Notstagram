@@ -1,8 +1,13 @@
 package apicela.notstagram.mappers;
 
+import apicela.notstagram.models.dtos.PostDTO;
+import apicela.notstagram.models.dtos.UserDTO;
 import apicela.notstagram.models.entities.User;
 import apicela.notstagram.models.requests.EditProfileRequest;
+import apicela.notstagram.models.responses.UserProfileResponse;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class UserMapper {
@@ -13,4 +18,21 @@ public class UserMapper {
         user.setProfilePhoto(profilePhoto != null ? profilePhoto : user.getProfilePhoto());
         return user;
     }
+
+    public UserDTO userToUserDTO(User user) {
+        return new UserDTO(
+                user.getUsername(),
+                user.getDescription(),
+                user.getProfilePhoto(),
+                user.isVerified(),
+                user.isPublicProfile(),
+                user.getFollowers().size(),
+                user.getFollowing().size()
+        );
+    }
+
+    public UserProfileResponse toUserProfileResponse(User user, List<PostDTO> posts) {
+        return new UserProfileResponse(userToUserDTO(user), posts);
+    }
+
 }

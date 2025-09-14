@@ -8,6 +8,7 @@ import apicela.notstagram.models.dtos.PostDTO;
 import apicela.notstagram.models.entities.Post;
 import apicela.notstagram.models.entities.User;
 import apicela.notstagram.repositories.PostRepository;
+import apicela.notstagram.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
@@ -26,15 +27,15 @@ import java.util.UUID;
 @Log4j2
 public class PostService {
     private final PostRepository postRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final PostMapper postMapper;
     private final FileStorageService fileStorageService;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, UserService userService, FileStorageService fileStorageService) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, UserRepository userRepository, FileStorageService fileStorageService) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
-        this.userService = userService;
         this.fileStorageService = fileStorageService;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -59,6 +60,11 @@ public class PostService {
         return postMapper.toDTO(post, user);
     }
 
+    public List<PostDTO> getPosts(User requester, User target) {
+        List<Post> posts = postRepository.findByUser(target);
+        return postMapper.toDTOList(posts, requester);
+    }
+
     public void likePost(User user, UUID postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
@@ -74,7 +80,7 @@ public class PostService {
     }
 
     public List<PostDTO> getFeed(User user) {
-        List<UUID> followingList = userService.findFollowingList(user.getId());
+        List<UUID> followingList = userRepository.findFollowingIds(user.getId());
         List<Post> posts = postRepository.findPostsFromFollowing(followingList);
         return postMapper.toDTOList(posts, user);
     }
@@ -90,7 +96,7 @@ public class PostService {
 
     private void validatePostVisibility(Post post, User requester) throws BadRequestException {
         boolean isPostOwner = requester.getId().equals(post.getUser().getId());
-        if(isPostOwner) return;
+        if (isPostOwner) return;
 
         if (!post.isVisible()) {
             throw new BadRequestException("Post is not visible");

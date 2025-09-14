@@ -1,10 +1,7 @@
 package apicela.notstagram.controllers;
 
 import apicela.notstagram.models.entities.User;
-import apicela.notstagram.models.requests.CompleteRegisterRequest;
-import apicela.notstagram.models.requests.LoginRequest;
-import apicela.notstagram.models.requests.RefreshTokenRequest;
-import apicela.notstagram.models.requests.VerificationCode;
+import apicela.notstagram.models.requests.*;
 import apicela.notstagram.models.responses.AuthResponse;
 import apicela.notstagram.models.responses.DefaultApiResponse;
 import apicela.notstagram.services.AuthService;
@@ -123,6 +120,16 @@ public class AuthController {
         return ResponseEntity.ok(refreshTokenService.rotateToken(request));
     }
 
+    @PostMapping("/reset-password")
+    public ResponseEntity<AuthResponse> resetPassword(@RequestBody @Valid EmailDTO dto) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.resetPassword(dto.email()));
+    }
+
+    @PreAuthorize("hasAuthority('RESET_PASSWORD')")
+    @PostMapping("/change-password")
+    public ResponseEntity<AuthResponse> changePassword(@AuthenticationPrincipal User user, @RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.changePassword(user, changePasswordRequest));
+    }
 
     record EmailDTO(@Schema(example = "jamilnetobr@gmail.com", description = "O e-mail do usuário")
                     @Email(message = "E-mail invalid") String email) {

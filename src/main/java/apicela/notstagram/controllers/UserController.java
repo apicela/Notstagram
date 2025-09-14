@@ -1,6 +1,7 @@
 package apicela.notstagram.controllers;
 
 import apicela.notstagram.models.entities.User;
+import apicela.notstagram.models.requests.EditProfileRequest;
 import apicela.notstagram.models.responses.DefaultApiResponse;
 import apicela.notstagram.services.UserService;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/users")
@@ -55,15 +59,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("#user.inactive")
-    @PostMapping("/me/activate")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Usuário ativado com sucesso")
-    })
-    public ResponseEntity<Void> activate(@AuthenticationPrincipal User user) {
-        userService.activateUser(user);
+    @PreAuthorize("!#user.inactive")
+    @PutMapping
+    public ResponseEntity<Void> editProfile(@AuthenticationPrincipal User user, EditProfileRequest editProfileRequest, @RequestPart("file") MultipartFile file) throws IOException {
+        userService.editProfile(user, editProfileRequest, file);
         return ResponseEntity.noContent().build();
     }
-
 }
 

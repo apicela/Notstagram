@@ -106,7 +106,7 @@ class PostServiceTest {
         Post post = new Post();
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
-        UserSummaryDTO userSummary = new UserSummaryDTO(mockUser.getUsername());
+        UserSummaryDTO userSummary = new UserSummaryDTO(mockUser.getUsername(), mockUser.getProfilePhoto());
         PostDTO postDTO = new PostDTO(
                 postId,
                 "Descrição do post",
@@ -117,8 +117,7 @@ class PostServiceTest {
                 userSummary,
                 0,
                 false,
-                0,
-                List.of()
+                0
         );
 
         when(postMapper.toDTO(post, mockUser)).thenReturn(postDTO);
@@ -148,7 +147,7 @@ class PostServiceTest {
         when(postRepository.findPostsFromFollowing(followingList)).thenReturn(posts);
 
         // Lista de PostDTOs que o mapper deve retornar
-        UserSummaryDTO userSummary = new UserSummaryDTO(mockUser.getUsername());
+        UserSummaryDTO userSummary = new UserSummaryDTO(mockUser.getUsername(), mockUser.getProfilePhoto());
 
         PostDTO postDTO = new PostDTO(
                 post.getId(),
@@ -160,8 +159,7 @@ class PostServiceTest {
                 userSummary,
                 0,       // likesCount
                 false,   // likedByMe
-                0,       // commentsCount
-                List.of() // recentComments
+                0       // commentsCount
         );
 
         List<PostDTO> dtoList = List.of(postDTO);
@@ -189,7 +187,7 @@ class PostServiceTest {
         post.setContentType("image/png");
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
-        GetMediaDTO mediaDTO = postService.loadFile(postId);
+        GetMediaDTO mediaDTO = postService.loadFile(mockUser, postId);
         assertArrayEquals("conteudo".getBytes(), mediaDTO.bytes());
         assertEquals("image/png", mediaDTO.contentType());
     }

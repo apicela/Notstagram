@@ -107,8 +107,8 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "Mídia não encontrada",
                     content = @Content(schema = @Schema(implementation = DefaultApiResponse.class)))
     })
-    public ResponseEntity<byte[]> getMedia(@PathVariable UUID id) throws IOException {
-        GetMediaDTO dto = postService.loadFile(id);
+    public ResponseEntity<byte[]> getMedia(@AuthenticationPrincipal User user, @PathVariable UUID id) throws IOException {
+        GetMediaDTO dto = postService.loadFile(user, id);
         return ResponseEntity.ok()
                 .contentType(org.springframework.http.MediaType.parseMediaType(dto.contentType()))
                 .body(dto.bytes());

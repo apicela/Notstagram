@@ -67,9 +67,7 @@ class PostControllerTest {
                 null,
                 0,
                 false,
-                0,
-                List.of()
-        );
+                0);
 
         when(postService.getPost(mockPostId, mockUser)).thenReturn(mockPostDTO);
 
@@ -92,9 +90,7 @@ class PostControllerTest {
                 null,
                 0,
                 false,
-                0,
-                List.of()
-        );
+                0);
 
         List<PostDTO> mockFeed = List.of(mockPostDTO);
         when(postService.getFeed(mockUser)).thenReturn(mockFeed);
@@ -113,13 +109,13 @@ class PostControllerTest {
 
         GetMediaDTO mockDTO = new GetMediaDTO(bytes, contentType);
 
-        when(postService.loadFile(mockPostId)).thenReturn(mockDTO);
+        when(postService.loadFile(mockUser,mockPostId)).thenReturn(mockDTO);
 
-        ResponseEntity<byte[]> response = postController.getMedia(mockPostId);
+        ResponseEntity<byte[]> response = postController.getMedia(mockUser,mockPostId);
 
         assertEquals(200, response.getStatusCodeValue());
         assertArrayEquals(bytes, response.getBody());
         assertEquals(contentType, response.getHeaders().getContentType().toString());
-        verify(postService, times(1)).loadFile(mockPostId);
+        verify(postService, times(1)).loadFile(mockUser,mockPostId);
     }
 }

@@ -27,12 +27,10 @@ public class PostMapper {
                 post.getType(),
                 post.getContentType(),
                 post.getCreatedAt(),
-                new UserSummaryDTO(post.getUser().getUsername()),
+                new UserSummaryDTO(post.getUser().getUsername(), post.getUser().getProfilePhoto()),
                 post.getLikedBy().size(),
                 likedByMe,
-                post.getComments().size(),
-                commentMapper.toDTOList(post.getComments())
-
+                post.getComments().size()
         );
     }
 

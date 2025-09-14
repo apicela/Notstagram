@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,12 +42,11 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = DefaultApiResponse.class)))
 
     })
-    public ResponseEntity<Void> uploadPost(@AuthenticationPrincipal User user,
+    public ResponseEntity<PostDTO> uploadPost(@AuthenticationPrincipal User user,
                                            @RequestPart("description") String description,
                                            @RequestPart("file") MultipartFile file
     ) throws IOException {
-        postService.createPost(user, file, description);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(user, file, description));
     }
 
     @GetMapping("/{id}")
@@ -66,17 +66,15 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/likes")
-    public ResponseEntity<Void> likePost(@AuthenticationPrincipal User user,
+    public ResponseEntity<PostDTO> likePost(@AuthenticationPrincipal User user,
                                          @PathVariable("postId") UUID postId) {
-        postService.likePost(user, postId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(postService.likePost(user, postId));
     }
 
     @DeleteMapping("/{postId}/likes")
-    public ResponseEntity<Void> unlikePost(@AuthenticationPrincipal User user,
+    public ResponseEntity<PostDTO> unlikePost(@AuthenticationPrincipal User user,
                                            @PathVariable("postId") UUID postId) {
-        postService.unlikePost(user, postId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(postService.unlikePost(user, postId));
     }
 
     @GetMapping("/feed")

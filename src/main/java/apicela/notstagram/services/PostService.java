@@ -39,7 +39,7 @@ public class PostService {
     }
 
     @Transactional
-    public void createPost(User user, MultipartFile file, String description) throws IOException {
+    public PostDTO createPost(User user, MultipartFile file, String description) throws IOException {
         String contentType = file.getContentType();
         PostType postType;
         if (contentType != null && contentType.startsWith("image/")) {
@@ -52,6 +52,7 @@ public class PostService {
 
         Post post = postMapper.toEntity(user, description, fileDTO.path(), postType, contentType);
         postRepository.save(post);
+        return postMapper.toDTO(post, user);
     }
 
     public PostDTO getPost(UUID postId, User user) {
@@ -65,18 +66,20 @@ public class PostService {
         return postMapper.toDTOList(posts, requester);
     }
 
-    public void likePost(User user, UUID postId) {
+    public PostDTO likePost(User user, UUID postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
         post.getLikedBy().add(user);
         postRepository.save(post);
+        return postMapper.toDTO(post, user);
     }
 
-    public void unlikePost(User user, UUID postId) {
+    public PostDTO unlikePost(User user, UUID postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
         post.getLikedBy().remove(user);
         postRepository.save(post);
+        return postMapper.toDTO(post, user);
     }
 
     public List<PostDTO> getFeed(User user) {

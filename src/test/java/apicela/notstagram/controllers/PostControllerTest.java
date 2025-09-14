@@ -49,7 +49,7 @@ class PostControllerTest {
 
         doNothing().when(postService).createPost(mockUser, mockFile, description);
 
-        ResponseEntity<Void> response = postController.uploadPost(mockUser, description, mockFile);
+        ResponseEntity<PostDTO> response = postController.uploadPost(mockUser, description, mockFile);
 
         assertEquals(204, response.getStatusCodeValue());
         verify(postService, times(1)).createPost(mockUser, mockFile, description);

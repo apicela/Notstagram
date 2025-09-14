@@ -2,6 +2,7 @@ package apicela.notstagram.services;
 
 import apicela.notstagram.exceptions.UnauthorizedException;
 import apicela.notstagram.mappers.CommentMapper;
+import apicela.notstagram.models.dtos.CommentDTO;
 import apicela.notstagram.models.entities.Comment;
 import apicela.notstagram.models.entities.Post;
 import apicela.notstagram.models.entities.User;
@@ -27,11 +28,12 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
-    public void commentPost(User user, CommentRequest dto, UUID postId) {
+    public CommentDTO commentPost(User user, CommentRequest dto, UUID postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
         Comment comment = commentMapper.toEntity(dto, user, post);
         commentRepository.save(comment);
+        return commentMapper.toDTO(comment);
     }
 
     public void removeComment(User user, UUID commentId) {

@@ -39,7 +39,7 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User found with sucesfull",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserProfileResponse.class)))),
+                    content = @Content(schema = @Schema(implementation = UserProfileResponse.class))),
             @ApiResponse(responseCode = "400", description = "User not found",
                     content = @Content(schema = @Schema(implementation = BadRequestException.class))),
             @ApiResponse(responseCode = "401", description = "Acess denied",
@@ -75,7 +75,7 @@ public class UserController {
     }
 
     @PreAuthorize("!#user.inactive")
-    @DeleteMapping("/me/deactivate")
+    @PatchMapping("/me/deactivate")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Usuário desativado com sucesso"),
             @ApiResponse(responseCode = "403", description = "Acess denied")
@@ -86,7 +86,7 @@ public class UserController {
     }
 
     @PreAuthorize("!#user.inactive")
-    @PatchMapping(path = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> editProfile(@AuthenticationPrincipal User user, EditProfileRequest editProfileRequest, @RequestPart(name = "file", required = false) MultipartFile file) throws IOException {
         userService.editProfile(user, editProfileRequest, file);
         return ResponseEntity.noContent().build();

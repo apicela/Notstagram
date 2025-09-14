@@ -133,7 +133,7 @@ public class AuthController {
     }
 
     @PreAuthorize("hasAuthority('RESET_PASSWORD')")
-    @PutMapping("/change-password")
+    @PatchMapping("/change-password")
     @Operation(
             summary = "Alterar senha do usuário",
             description = "Permite que o usuário altere sua senha após solicitar a redefinição. "

@@ -2,15 +2,16 @@ package apicela.notstagram.services;
 
 import apicela.notstagram.mappers.PostMapper;
 import apicela.notstagram.models.PostType;
+import apicela.notstagram.models.dtos.FileDTO;
 import apicela.notstagram.models.dtos.GetMediaDTO;
 import apicela.notstagram.models.dtos.PostDTO;
 import apicela.notstagram.models.entities.Post;
 import apicela.notstagram.models.entities.User;
 import apicela.notstagram.repositories.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,15 +28,16 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
     private final PostMapper postMapper;
-    @Value("${upload.dir}")
-    private String uploadDir;
+    private final FileStorageService fileStorageService;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, UserService userService) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, UserService userService, FileStorageService fileStorageService) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.userService = userService;
+        this.fileStorageService = fileStorageService;
     }
 
+    @Transactional
     public void createPost(User user, MultipartFile file, String description) throws IOException {
         String contentType = file.getContentType();
         PostType postType;
@@ -45,17 +47,9 @@ public class PostService {
             postType = PostType.VIDEO;
         } else throw new BadRequestException("Invalid content type");
 
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        FileDTO fileDTO = fileStorageService.saveFile(file);
 
-        Path filePath = Paths.get(uploadDir, fileName);
-
-        // Cria diretório se não existir
-        Files.createDirectories(filePath.getParent());
-
-        // Salva fisicamente no sistema de arquivos
-
-        Files.write(filePath, file.getBytes());
-        Post post = postMapper.toEntity(user, description, filePath.toString(), postType, contentType);
+        Post post = postMapper.toEntity(user, description, fileDTO.path(), postType, contentType);
         postRepository.save(post);
     }
 
@@ -85,11 +79,30 @@ public class PostService {
         return postMapper.toDTOList(posts, user);
     }
 
-    public GetMediaDTO loadFile(UUID postId) throws IOException {
+    public GetMediaDTO loadFile(User user, UUID postId) throws IOException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
+        validatePostVisibility(post, user);
         Path path = Paths.get(post.getMediaPath());
         return new GetMediaDTO(Files.readAllBytes(path), post.getContentType());
     }
+
+    private void validatePostVisibility(Post post, User requester) throws BadRequestException {
+        boolean isPostOwner = requester.getId().equals(post.getUser().getId());
+        if(isPostOwner) return;
+
+        if (!post.isVisible()) {
+            throw new BadRequestException("Post is not visible");
+        }
+
+        boolean ownerInactive = post.getUser().isInactive();
+        boolean ownerPrivate = !post.getUser().isPublicProfile();
+        boolean requesterIsFollower = post.getUser().getFollowers().contains(requester);
+
+        if (ownerInactive || (ownerPrivate && !requesterIsFollower)) {
+            throw new BadRequestException("Post is not visible");
+        }
+    }
+
 }
